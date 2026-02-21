@@ -23,6 +23,7 @@ for i in range(len(array)):
 
 if existe == False:
     print("Nenhum elemento é a soma de dois anteriores")
-else: print("Existe um elemento que é a soma dos dois anteriores")
+else: print("Existe um elemento que é a soma de dois anteriores")
+
 
 
