@@ -114,7 +114,6 @@ class Biblioteca:
 biblioteca = Biblioteca()
 
 #PROGRAMA PRINCIPAL
-
 def main():
     while True:
         print(" ========== MENU ==========\n"

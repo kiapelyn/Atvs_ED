@@ -26,6 +26,7 @@ def calcular_maior(frequencia, maior):
             maiores.append(valor)
     return maiores
 
+#PROGRAMA PRINCIPAL
 def main():
     qnt = int(input("Quantos elementos terá a lista? "))
     array = entrada_de_dados(qnt)
