@@ -1,160 +1,174 @@
 class Livro:
-    def __init__(self, titulo:str, autor:str, disp:bool):
+    def __init__(self, titulo: str, autor: str, disponivel: bool = True):
         self.titulo = titulo
         self.autor = autor
-        self.disp = disp
-    
-    def emprestar(self):
-        self.disp = False
-    
-    def devolver(self):
-        self.disp = True
-    
-    def __str__(self) -> str:
-        if self.disp:
-            disponibilidade = "Disponível"
+        self.disponivel = disponivel
+
+    def emprestar(self) -> bool:
+        if self.disponivel:
+            print("Emprestimo disponivel")
+        else: print("Emprestimo indisponivel")
+        return self.disponivel
+
+    def devolver(self) -> bool:
+        if self.disponivel == False:
+            print("Devolução possível")
+            return True
         else:
-            disponibilidade = "Indisponível"
-        return f'TÍTULO: {self.titulo} | AUTOR: {self.autor} | DISPONIBILIDADE: {disponibilidade}'
-    
+            print("Livro não está emprestado")
+            return False
+
+    def __str__(self):
+        if self.disponivel: disp = "Disponível"
+        else: disp = "Emprestado"
+        return f"Título: {self.titulo} | Autor: {self.autor} | Status: {disp}"
+
 class Usuario:
-    def __init__(self, ra:int, nome:str):
-        self.ra = ra
+    def __init__(self, nome: str, ra: int):
         self.nome = nome
-        self.livrosEmp = []
-        
-    def emprestar_livro(self, livro:Livro):
-        if livro.disp:
-            livro.emprestar()
-            self.livrosEmp.append(livro)
-            print("Empréstimo executado com sucesso!")
+        self.ra = ra
+        self.lista = []
+
+    def emprestar_livro(self, livro):
+            if livro.emprestar():
+                self.lista.append(livro)
+                livro.disponivel = False
+                print("Empréstimo realizado")
+            else:
+                print("Livro indisponível")
+
+    def devolver_livro(self, livro):
+        if livro in self.lista:
+            if livro.devolver():
+                self.lista.remove(livro)
+                livro.disponivel = True
+                print("Devolução realizada")
         else:
-            print("Livro indisponível.")
-            
-    def devolver_livro(self, livro:Livro):
-        if livro in self.livrosEmp:
-            livro.devolver() 
-            
-            nova_lista = []
-            
-            for l in self.livrosEmp:
-                if l != livro:
-                    nova_lista.append(l)
-            self.livrosEmp = nova_lista
-            print("Devolução executada com sucesso!")
-            
-        else:
-            print("Não foi possível realizar a devolução.")
-    
-    def listar_livros(self):
-        return self.livrosEmp
-        
+            print("Devolução inexistente")
+
+    def listas_livros(self) -> list:
+        return self.lista
+
 class Biblioteca:
     def __init__(self):
         self.livros = []
         self.usuarios = []
-    
-    def cadastrar_livro(self, livro:Livro):
-        for livrinho in self.livros:
-            if livrinho.titulo == livro.titulo:
-                print("Título já cadastrado.")
+
+    def cadastrar_livro(self, livro: Livro):
+        for i in self.livros:
+            if i.titulo == livro.titulo:
+                print("Este livro já foi cadastrado")
                 return
         self.livros.append(livro)
-        print("Título cadastrado com sucesso.")
-            
-    def cadastrar_usuario(self, usuario:Usuario):
-        for u in self.usuarios:
-            if u.ra == usuario.ra:
-                print("Usuário já cadastrado.")
+        print("Livro cadastrado com sucesso")
+
+    def cadastrar_usuario(self, usuario: Usuario):
+        for i in self.usuarios:
+            if i.ra == usuario.ra:
+                print("RA já cadastrado")
                 return
         self.usuarios.append(usuario)
-        print("Usuário cadastrado com sucesso.")
-    
-    def realizar_emprestimo(self, ra, titulo):
-        usuario_encontrado = next((u for u in self.usuarios if u.ra == ra), None)
-        livro_encontrado = next((l for l in self.livros if l.titulo == titulo), None)
-        
-        if not usuario_encontrado:
-            print("Usuário não encontrado.")
-            return
-        if not livro_encontrado:
-            print("Livro não encontrado.")
-            return
-        
-        usuario_encontrado.emprestar_livro(livro_encontrado)
-            
-    def realizar_devolucao(self, ra, titulo):
-        usuario_encontrado = next((u for u in self.usuarios if u.ra == ra), None)
-        livro_encontrado = next((l for l in self.livros if l.titulo == titulo), None)
-        
-        if not usuario_encontrado or not livro_encontrado:
-            print("Usuário ou Livro não encontrados.")
-            return
-            
-        usuario_encontrado.devolver_livro(livro_encontrado)
-            
+        print("Usuário cadastrado com sucesso")
+
+    def buscar(self, ra: int, titulo: str):
+        usuario, livro = None, None
+        for i in self.usuarios:
+            if i.ra == ra:
+                usuario = i
+                break
+        for i in self.livros:
+            if i.titulo == titulo:
+                livro = i
+                break
+        return usuario, livro
+
+    def realizar_emprestimo(self, ra: int, titulo: str):
+        usuario, livro = self.buscar(ra, titulo)
+
+        if usuario is None: print("Usuário não cadastrado")
+        elif livro is None: print("Livro não cadastrado")
+        else: usuario.emprestar_livro(livro)
+
+    def realizar_devolucao(self, ra: int, titulo: str):
+        usuario, livro = self.buscar(ra, titulo)
+
+        if usuario is None: print("Usuário não cadastrado")
+        elif livro is None: print("Livro não cadastrado")
+        else: usuario.devolver_livro(livro)
+
     def listar_livros_disponiveis(self):
-        disponiveis = [l for l in self.livros if l.disp]
-        if not disponiveis:
-            print("Nenhum livro disponível no momento.")
-        else:
-            for l in disponiveis:
-                print(l)
-    
-    def listar_livros_emprestados_usuario(self, ra):
-        usuario_encontrado = next((u for u in self.usuarios if u.ra == ra), None)
-        if usuario_encontrado:
-            livros = usuario_encontrado.listar_livros()
-            if not livros:
-                print("O usuário não possui livros emprestados.")
-            else:
-                for l in livros:
-                    print(l)
-        else:
-            print("Usuário não encontrado.")
+        disponiveis = []
+        for i in self.livros:
+            if i.disponivel:
+                disponiveis.append(i)
+        return disponiveis
+
+    def listar_livros_emprestados_usuarios(self, ra):
+        for i in self.usuarios:
+            if i.ra == ra:
+                return i.listas_livros()
+        return []
+
+
+#INSTANCIAS
+biblioteca = Biblioteca()
+
+#PROGRAMA PRINCIPAL
 
 def main():
-    biblioteca = Biblioteca()
-
     while True:
-        menu = int(input("\nDigite o número da operação: \n1. Cadastrar livro \n2. Cadastrar usuário \n3. Realizar empréstimo \n4. Realizar devolução \n5. Listar livros disponíveis \n6. Listar livros emprestados ao usuário \n7. Finalizar \n--> "))
-
-        match menu:
+        print(" ========== MENU ==========\n"
+        "1. Cadastrar livro\n"
+        "2. Cadastrar usuário\n"
+        "3. Realizar empréstimo\n"
+        "4. Realizar devolução\n"
+        "5. Listar livros disponíveis\n"
+        "6. Listar livros emprestados ao usuário\n"
+        "7. Finalizar")
+        op = int(input("Escolha uma opção: "))
+        print()
+        match op:
             case 1:
                 titulo = input("Título do livro: ")
-                autor = input("Nome do Autor: ")
-                disponibilidade = input("Disponível (0) ou Indisponível (1): ")
-                disp = True if disponibilidade == '0' else False 
-                biblioteca.cadastrar_livro(Livro(titulo, autor, disp))
-
+                autor = input("Autor do livro: ")
+                livro = Livro(titulo, autor)
+                biblioteca.cadastrar_livro(livro)
             case 2:
-                ra = int(input("RA do usuário: "))
                 nome = input("Nome do usuário: ")
-                biblioteca.cadastrar_usuario(Usuario(ra, nome))
-            
+                ra = int(input("RA do usuário: "))
+                usuario = Usuario(nome, ra)
+                biblioteca.cadastrar_usuario(usuario)
             case 3:
                 ra = int(input("RA do usuário: "))
                 titulo = input("Título do livro: ")
                 biblioteca.realizar_emprestimo(ra, titulo)
-
             case 4:
                 ra = int(input("RA do usuário: "))
                 titulo = input("Título do livro: ")
                 biblioteca.realizar_devolucao(ra, titulo)
-
             case 5:
-                biblioteca.listar_livros_disponiveis()
-                
+                livros = biblioteca.listar_livros_disponiveis()
+                if livros:
+                    for livro in livros:
+                        print(livro)
+                else:
+                    print("Nenhum livro disponível.")
             case 6:
                 ra = int(input("RA do usuário: "))
-                biblioteca.listar_livros_emprestados_usuario(ra)
-                
+                livros = biblioteca.listar_livros_emprestados_usuarios(ra)
+                if livros:
+                    for livro in livros:
+                        print(livro)
+                else:
+                    print("Nenhum livro emprestado para este usuário.")
             case 7:
-                print("Sistema finalizado.")
+                print("Encerrado")
                 break
-                
             case _:
-                print("Opção inválida. Tente novamente.")
+                print("Opção invalida!")
+
+        print()
 
 if __name__ == "__main__":
     main()
+
