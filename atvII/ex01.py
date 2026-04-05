@@ -4,13 +4,11 @@ class No:
         self.dir = None
         self.esq = None
 
-
 class ListaDupla:
     def __init__(self):
         self.inicio = None
         self.fim = None
         self.tamanho = 0
-
 
     def inserirFim(self, dado):
         novo = No(dado)
@@ -22,7 +20,7 @@ class ListaDupla:
             self.fim.dir = novo
             novo.esq = self.fim
             self.inicio.esq = novo
-            novo.dir = self.inicio #referencia pro inicio da lista
+            novo.dir = self.inicio
 
         self.fim = novo
         self.tamanho += 1
@@ -35,7 +33,7 @@ class ListaDupla:
 
         else:
             novo.dir = self.inicio
-            novo.esq = self.fim # referencia pro fim da lista
+            novo.esq = self.fim
             self.fim.dir = novo
             self.inicio.esq = novo
 
@@ -43,50 +41,53 @@ class ListaDupla:
         self.tamanho += 1
 
     def inserirPosicao(self, posicao, dado):
-        posicao -= 1 # espécie de "conversão" pois o for vai inicializar em 0,
-                     # assim a posição digitada é a mesma que será inserido
+        posicao -= 1
         novo = No(dado)
-
-        aux = self.inicio
-        #bets pensa numa lista com posicao a, b e c e a gente ta pondo o novo na segunda posiçao (entre a e b)
 
         if posicao < 0:
             return
 
-        for i in range(posicao):
-            aux = aux.dir # corre a lista até pegar o valor q ta na posicao q a gente quer o novo (ex: b)
-
-        if posicao >= self.tamanho: # se a posição for igual ao tamanho, ou maior, é a ms coisa q por no fim
+        if posicao >= self.tamanho:
             self.inserirFim(dado)
             return
+        
         elif posicao == 0:
             self.inserirInicio(dado)
+            return
+
+        aux = self.inicio
+        for i in range(posicao):
+            aux = aux.dir
+
+        novo.esq = aux.esq
+        novo.dir = aux
+
+        if aux.esq:
+            novo.esq.dir = novo
         else:
-            novo.esq = aux.esq # poe o endereço que ta na esquerda de b para a esquerda do novo
-            novo.dir = aux # poe o endereço de b na direita do novo
+            self.inicio = novo
 
-            if aux.esq: # verifica que nao é o primeiro valor da lista
-                novo.esq.dir = novo # poe o endereço de novo na direita do a
-            else: #se for, atribui no inicio msm
-                self.inicio =  novo
-
-            novo.dir.esq = novo # poe o endereço de novo na esquerda do b
-
+        novo.dir.esq = novo
         self.tamanho += 1
-
 
     def imprimir(self):
         aux = self.inicio
         contador = 0
+
         while contador < self.tamanho:
             print(aux.dado, end=' ')
             aux = aux.dir
             contador += 1
+
         print()
 
     def pesquisar(self, dado):
+        if self.tamanho == 0:
+            return None
+        
         aux = self.inicio
-        while aux:
+
+        for _ in range(self.tamanho):
             if aux.dado == dado:
                 return aux
             aux = aux.dir
@@ -96,7 +97,6 @@ class ListaDupla:
         aux = self.pesquisar(dado)
 
         if aux is not None:
-
             if self.tamanho == 1:
                 self.inicio = None
                 self.fim = None
@@ -114,7 +114,6 @@ class ListaDupla:
             else:
                 aux.esq.dir = aux.dir
                 aux.dir.esq = aux.esq
-
             self.tamanho -= 1
 
         aux = None
@@ -132,6 +131,7 @@ def main():
         "5. Sair")
         op = int(input("Escolha uma opção: "))
         print()
+
         match op:
             case 1:
                 dado = int(input("Insira o dado do final: "))
@@ -152,6 +152,7 @@ def main():
             case 5:
                 print("Saindo do programa")
                 break
+            
             case _:
                 print("Insira uma opção válida")
                 break
