@@ -4,7 +4,6 @@ class No:
         self.dir = None
         self.esq = None
 
-
 class ListaDupla:
     def __init__(self):
         self.inicio = None
@@ -36,7 +35,7 @@ class ListaDupla:
     def executar(self, fatia):
         auxiliar = []
         if self.tamanho == 0:
-            return
+            return []
 
         tempo_global = 0
         dado = self.inicio
@@ -55,15 +54,15 @@ class ListaDupla:
             if dado.dado["tempo_restante"] == 0:
                 dado.dado["tempo_retorno"] = tempo_global
                 auxiliar.append({
-                                 "nome": dado.dado["nome"],
-                                 "tempo_total": dado.dado["tempo_total"],
-                                 "tempo_espera": tempo_global - dado.dado["tempo_total"],
-                                 "tempo_retorno": tempo_global
-                                 })
+                    "nome": dado.dado["nome"],
+                    "tempo_total": dado.dado["tempo_total"],
+                    "tempo_espera": tempo_global - dado.dado["tempo_total"],
+                    "tempo_retorno": tempo_global
+                })
                 self.remover(dado)
 
             dado = aux
-            
+
         return auxiliar
 
     def remover(self, dado):
@@ -84,20 +83,41 @@ class ListaDupla:
                 self.fim = dado.esq
 
         self.tamanho -= 1
-        
+
     def calcular_medias(self, auxiliar):
         media_espera = 0
         media_retorno = 0
-        
+
         for i in range(len(auxiliar)):
             media_espera += auxiliar[i]['tempo_espera']
             media_retorno += auxiliar[i]['tempo_retorno']
-            
+
         media_espera /= len(auxiliar)
         media_retorno /= len(auxiliar)
-            
+
         return media_espera, media_retorno
-        
+
+    def imprimir(self, auxiliar, fatia):
+        media_espera, media_retorno = self.calcular_medias(auxiliar)
+
+        print("\nRELATÓRIO FINAL — ARIA Recovery Module")
+        print(f"Fatia de tempo (quantum): {fatia} unidades")
+        print(f"{'Processo':<16} {'Tempo Total':<14} {'Tempo Espera':<15} {'Tempo Retorno'}")
+        print("-" * 58)
+
+        for i in auxiliar:
+            print(f"{i['nome']:<16} {i['tempo_total']:<14} {i['tempo_espera']:<15} {i['tempo_retorno']}")
+
+        print("-" * 58)
+        print(f"{'Média':<16} {'-':<14} {media_espera:<15} {media_retorno}")
+        print("-" * 58)
+
+        if media_espera < 16:
+            print("\n✓ ARIA reativada com sucesso.")
+            print(f"  Tempo médio de espera ({media_espera}) abaixo do limite crítico (16). Synthetica está salva.")
+        else:
+            print("\n✗ Falha crítica confirmada. Iniciando protocolo de desligamento de emergência.")
+
 
 def main():
     lista = ListaDupla()
@@ -110,30 +130,14 @@ def main():
 
     for i in range(qtd):
         print(f"Processo {i+1}:")
-
         nome = input("Nome: ")
         tempo = int(input("Tempo necessário: "))
-
         lista.inserirFim(nome, tempo)
 
     auxiliar = lista.executar(fatia)
-    media_espera, media_retorno = lista.calcular_medias(auxiliar)
+    lista.imprimir(auxiliar, fatia)
 
-
-    print("RELATÓRIO FINAL - ARIA Recovery Module.")
-    print(f"Faria de tempo (quantum): {fatia} unidades")
-    print("----------------------------------------------------------")
-    print(f"Processo      Tempo Total   Tempo Espera   Tempo Retorno")
-    for i in range(len(auxiliar)):
-        print(f"{auxiliar[i]['nome']}    {auxiliar[i]['tempo_total']}     {auxiliar[i]['tempo_espera']}     {auxiliar[i]['tempo_retorno']}")
-    
-    print(f"média do tempo de espera: {media_espera}")
-    print(f"média do tempo de retorno: {media_retorno}")
-    
-    if media_espera < 16:
-        print('ARIA reativada com sucesso.')
-    else:
-        print("Falha crítica confirmada. Iniciando protocolo de desligamento de emergência.")
 
 if __name__ == "__main__":
     main()
+    
