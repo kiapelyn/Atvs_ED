@@ -1,33 +1,3 @@
-# a pessoa q montou isso n está mentalmente estável, sem ofensas, muito obrigada
-
-'''Semaforo custa 8
-Hospital custa 4
-Energia custa 9
-Transporte custa 5'''
-
-'''ordem: 
-- semaforo -> 8 pra 5
-- hospital -> 4 pra 1
-- energia -> 9 pra 6
-- transporte -> 5 pra 2
-- semaforo -> 5 pra 2
-- hospital -> 1 pra concluído
-- energia -> 6 pra 3
-- transporte -> 2 pra concluído
-- semaforo -> 2 pra concluído
-- energia -> 3 pra concluído'''
-
-'''O que falta:
-
-7. Exibir ao final um relatório completo com os tempos de espera e retorno de cada processo.
-Simulação completa
-
-'''
-
-# precisa ser um loop até tudo concluir, oq acabou tem q sair, tem q ser duplamente encadeado circular
-
-''' cara oq diabos é pra por de input? dados seria o nome do processo e o tempo necessário?'''
-
 class No:
     def __init__(self, dado: dict):
         self.dado = dado
@@ -64,6 +34,7 @@ class ListaDupla:
         self.tamanho += 1
 
     def executar(self, fatia):
+        auxiliar = []
         if self.tamanho == 0:
             return
 
@@ -83,11 +54,18 @@ class ListaDupla:
 
             if dado.dado["tempo_restante"] == 0:
                 dado.dado["tempo_retorno"] = tempo_global
+                auxiliar.append({
+                                 "nome": dado.dado["nome"],
+                                 "tempo_total": dado.dado["tempo_total"],
+                                 "tempo_espera": tempo_global - dado.dado["tempo_total"],
+                                 "tempo_retorno": tempo_global
+                                 })
                 self.remover(dado)
 
             dado = aux
+            
+        return auxiliar
 
-    # remove o concluído
     def remover(self, dado):
         if self.tamanho == 0 or dado is None:
             return
@@ -106,7 +84,20 @@ class ListaDupla:
                 self.fim = dado.esq
 
         self.tamanho -= 1
-
+        
+    def calcular_medias(self, auxiliar):
+        media_espera = 0
+        media_retorno = 0
+        
+        for i in range(len(auxiliar)):
+            media_espera += auxiliar[i]['tempo_espera']
+            media_retorno += auxiliar[i]['tempo_retorno']
+            
+        media_espera /= len(auxiliar)
+        media_retorno /= len(auxiliar)
+            
+        return media_espera, media_retorno
+        
 
 def main():
     lista = ListaDupla()
@@ -125,11 +116,24 @@ def main():
 
         lista.inserirFim(nome, tempo)
 
-    lista.executar(fatia)
+    auxiliar = lista.executar(fatia)
+    media_espera, media_retorno = lista.calcular_medias(auxiliar)
 
-    print("Execução finalizada.")
-    #sinceramente, n tenho certeza de nada, amh quando eu adaptar pro relatório eu descubro :D
 
+    print("RELATÓRIO FINAL - ARIA Recovery Module.")
+    print(f"Faria de tempo (quantum): {fatia} unidades")
+    print("----------------------------------------------------------")
+    print(f"Processo      Tempo Total   Tempo Espera   Tempo Retorno")
+    for i in range(len(auxiliar)):
+        print(f"{auxiliar[i]['nome']}    {auxiliar[i]['tempo_total']}     {auxiliar[i]['tempo_espera']}     {auxiliar[i]['tempo_retorno']}")
+    
+    print(f"média do tempo de espera: {media_espera}")
+    print(f"média do tempo de retorno: {media_retorno}")
+    
+    if media_espera < 16:
+        print('ARIA reativada com sucesso.')
+    else:
+        print("Falha crítica confirmada. Iniciando protocolo de desligamento de emergência.")
 
 if __name__ == "__main__":
     main()
