@@ -1,6 +1,7 @@
+# força foco e café
 class Especie:
     def __init__(self, codigoRaridade:int, continenteOrigem:str, nomeComum:str, qtdAmostras:int, nomeCientifico:str):
-        self.codigoRaridade = codigoRaridade       #chave avl
+        self.codigoRaridade = codigoRaridade #chave da arvorezita
         self.continenteOrigem = continenteOrigem   
         self.nomeComum = nomeComum                 
         self.qtdAmostras = qtdAmostras             
@@ -9,17 +10,15 @@ class Especie:
     def __repr__(self):
         return f"[CR: {self.codigoRaridade:04d}] {self.nomeComum:<10} ({self.nomeCientifico}) | {self.continenteOrigem:<10} | Amostras: {self.qtdAmostras}"
 
-
 class No:
     def __init__(self, especie):
         self.especie = especie 
         self.esq = None   
         self.dir = None   
-        self.altura = 1         # folha começa com altura 1
+        self.altura = 1 # folha começa com altura 1
 
     def __repr__(self):
         return str(self.especie)
-
 
 class AVLArkSeed:
     def __init__(self):
@@ -70,14 +69,18 @@ class AVLArkSeed:
 
         if fb > 1 and self._fator_bal(no.esq) >= 0:
             return self._rotacao_direita(no)
+        
         if fb > 1 and self._fator_bal(no.esq) < 0:
             no.esq = self._rotacao_esquerda(no.esq)
             return self._rotacao_direita(no)
+        
         if fb < -1 and self._fator_bal(no.dir) <= 0:
             return self._rotacao_esquerda(no)
+        
         if fb < -1 and self._fator_bal(no.dir) > 0:
             no.dir = self._rotacao_direita(no.dir)
             return self._rotacao_esquerda(no)
+        
         return no
 
     # a) Catalogar espécie
